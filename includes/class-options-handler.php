@@ -158,11 +158,7 @@ class Options_Handler {
 		}
 
 		if ( isset( $settings['tags'] ) ) {
-			$this->options['tags'] = str_replace(
-				', ',
-				',',
-				sanitize_text_field( $settings['tags'] )
-			);
+			$this->options['tags'] = preg_replace( '~,\s+~', ',', sanitize_text_field( $settings['tags'] ) );
 		}
 
 		if ( isset( $settings['host'] ) ) {

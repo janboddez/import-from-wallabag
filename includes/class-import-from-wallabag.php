@@ -175,8 +175,8 @@ class Import_From_Wallabag {
 			}
 
 			if ( apply_filters( 'import_from_wallabag_skip_duplicates', true, $entry ) ) {
-				// Requires custom field support for `$post_type`!
-				/* @todo: Use a custom table to keep track of previously imported items. */
+				// Requires custom field support for `$post_type`! Or does it?
+				/* @todo: Use a custom table to keep track of previously imported items? */
 				$query = new \WP_Query(
 					array(
 						'post_type'           => (string) $options['post_type'] ? $options['post_type'] : 'post', // The selected post type.
@@ -225,6 +225,9 @@ class Import_From_Wallabag {
 				'post_status'  => $post_status,
 				'post_type'    => $post_type,
 				'post_date'    => get_date_from_gmt( date( 'Y-m-d H:i:s', strtotime( $entry->created_at ) ), 'Y-m-d H:i:s' ), // phpcs:ignore WordPress.DateTime.RestrictedFunctions.date_date
+				'meta_input'   => array(
+					'import_from_wallabag_uri' => esc_url_raw( $entry->url ),
+				),
 			);
 			$args = apply_filters( 'import_from_wallabag_post_args', $args, $entry );
 
@@ -233,10 +236,6 @@ class Import_From_Wallabag {
 			if ( $post_id ) {
 				// Success!
 				$imported++;
-
-				if ( post_type_supports( $post_type, 'custom-fields' ) ) {
-					update_post_meta( $post_id, 'import_from_wallabag_uri', esc_url_raw( $entry->url ) );
-				}
 
 				if ( post_type_supports( $post_type, 'post-formats' ) && ! empty( $post_format ) ) {
 					set_post_format( $post_id, $post_format );
