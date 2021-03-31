@@ -13,7 +13,8 @@ Import From Wallabag will automatically run twice a day and import the most rece
 Use `import_from_wallabag_api_args` to filter the [API arguments](https://app.wallabag.it/api/doc#get--api-entries.{_format}):
 ```
 add_filter( 'import_from_wallabag_api_args', function( $args ) {
-  $args['perPage'] = 60; // When 30 is not enough.
+  $args['perPage'] = 60;   // When 30 is not enough.
+  unset( $args['since'] ); // Grab all last 60 items, regardless of when they were created.
   return $args;
 }, 10, 2 );
 ```
