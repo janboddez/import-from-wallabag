@@ -73,6 +73,7 @@ class Import_From_Wallabag {
 	 * @since 0.1.0
 	 */
 	public function import() {
+		// Like `get_option()` but with sensible (?) defaults.
 		$options = $this->get_options_handler()->get_options();
 
 		if ( empty( $options['host'] ) ) {
@@ -136,6 +137,10 @@ class Import_From_Wallabag {
 			$args['tags'] = $options['tags'];
 		}
 
+		if ( ! empty( $options['last_run'] ) ) {
+			$args['since'] = $options['last_run'];
+		}
+
 		$args = (array) apply_filters( 'import_from_wallabag_api_args', $args );
 
 		$response = wp_remote_get(
@@ -161,6 +166,9 @@ class Import_From_Wallabag {
 		if ( empty( $data->_embedded->items ) || ! is_array( $data->_embedded->items ) ) {
 			return;
 		}
+
+		$options['last_run'] = time();
+		update_option( 'import_from_wallabag_settings', $options );
 
 		$imported = 0;
 		$skipped  = 0;
@@ -255,7 +263,7 @@ class Import_From_Wallabag {
 	public function activate() {
 		// Schedule a daily cron job.
 		if ( false === wp_next_scheduled( 'import_from_wallabag' ) ) {
-			wp_schedule_event( time() + 600, 'twicedaily', 'import_from_wallabag' );
+			wp_schedule_event( time(), 'twicedaily', 'import_from_wallabag' );
 		}
 	}
 

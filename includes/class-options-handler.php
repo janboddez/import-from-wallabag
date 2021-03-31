@@ -28,6 +28,7 @@ class Options_Handler {
 		'post_type'     => 'post',
 		'post_status'   => 'draft',
 		'post_format'   => 'standard',
+		'last_run'      => 0,
 	);
 
 	/**
@@ -186,6 +187,8 @@ class Options_Handler {
 				}
 			}
 		}
+
+		wp_schedule_single_event( time(), 'import_from_wallabag' );
 
 		// Updated settings.
 		return $this->options;
